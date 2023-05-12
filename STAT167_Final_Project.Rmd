@@ -1,0 +1,30 @@
+---
+title: "STAT167 Final Project - Spring 2023"
+authors: "Ryan Solanki #add your names here"
+date: "2023/5/12"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+#STAT 167 Final Project - Spring 2023
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Loading the dataset of US car accident data
+```{r}
+#Change path to work for your dataset path
+accident_df <- read_csv("C:/Users/ryans/Downloads/US_Accidents.csv")
+```
+```{r}
+# Create subset of LA car accidents to perform analysis on and create a model
+la_accidents <- subset(accident_df, accident_df$County == "Los Angeles")
+head(la_accidents, 20)
+```
+
