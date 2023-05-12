@@ -19,9 +19,30 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##Loading the dataset of US car accident data
 ```{r}
+library(tidyverse)
 # Load subset of LA car accident data
 la_accidents <- read_csv("LA_Accidents.csv")
-
-la_accidents(head, 20)
+head(la_accidents,5)
 ```
+```{r}
+library(CatEncoders)
+updatedAccidents2 <- la_accidents[-5:-6]
+updatedAccidents <- la_accidents[-5:-6]
+lab_enc = LabelEncoder.fit(updatedAccidents$City)
+
+updatedAccidents$City <- transform(lab_enc, updatedAccidents$City)
+
+lab_enc = LabelEncoder.fit(updatedAccidents$Weather_Condition)
+
+updatedAccidents$Weather_Condition <- transform(lab_enc, updatedAccidents$Weather_Condition)
+(updatedAccidents)
+
+#storage <- list()
+#for(i in names(la_accidents)[-1]){
+#  storage[[i]] <- summary(lm(Severity ~ get(i), la_accidents))
+#}
+
+#print(storage)
+```
+
 
