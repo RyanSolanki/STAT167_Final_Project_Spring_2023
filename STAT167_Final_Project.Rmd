@@ -17,11 +17,27 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+##Required libraries
+```{r}
+library(tidyverse)
+```
+
 ##Loading the dataset of US car accident data
 ```{r}
 # Load subset of LA car accident data
 la_accidents <- read_csv("LA_Accidents.csv")
 
 la_accidents(head, 20)
+```
+
+##Exploratory Data Analysis (Graphs)
+```{r}
+
+```
+
+
+##Linear Regression Model
+```{r}
+
 ```
 
