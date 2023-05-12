@@ -25,9 +25,9 @@ library(tidyverse)
 ##Loading the dataset of US car accident data
 ```{r}
 # Load subset of LA car accident data
-la_accidents <- read_csv("LA_Accidents.csv")
+la_accidents <- read.csv("LA_Accidents.csv")
 
-la_accidents(head, 20)
+head(la_accidents, 20)
 ```
 
 ##Exploratory Data Analysis (Graphs)
