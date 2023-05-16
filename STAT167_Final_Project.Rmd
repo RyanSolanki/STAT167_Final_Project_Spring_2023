@@ -17,6 +17,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+##Required libraries
+```{r}
+library(tidyverse)
+```
+
 ##Loading the dataset of US car accident data
 ```{r}
 library(tidyverse)
@@ -66,9 +71,10 @@ SeverityvsWeatherPlot <- ggplot(data = plotData) +
   geom_text(mapping = aes(x = Severity, y = count, fill = Weather_Condition, label = count),hjust = -.1, position = position_dodge(width = .9)) + coord_flip()
   
 SeverityvsWeatherPlot
-pdf(file="WeatherCond_Vs_Severity.pdf")
-SeverityvsWeatherPlot
-dev.off()
+#pdf(file="WeatherCond_Vs_Severity.pdf")
+#SeverityvsWeatherPlot
+#dev.off()
+
 ```
 
 
