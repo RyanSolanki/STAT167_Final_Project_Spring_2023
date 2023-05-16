@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ##Required libraries
 ```{r}
 library(tidyverse)
+library(CatEncoders)
 ```
 
 ##Loading the dataset of US car accident data
@@ -30,14 +31,44 @@ la_accidents <- read.csv("LA_Accidents.csv")
 head(la_accidents, 20)
 ```
 
+##Data Cleaning
+```{r}
+# Remove County and State columns because they are all the same
+updatedAccidents <- la_accidents[-5:-6]
+updatedAccidents <- filter(updatedAccidents, Severity != 1)
+updatedAccidents <- mutate(updatedAccidents, Severity = Severity - 1)
+```
+
+
 ##Exploratory Data Analysis (Graphs)
 ```{r}
+library(ggplot2)
 
+ggplot(updatedAccidents, aes(x=Wind_Speed.mph., y=Temperature.F., color=factor(Severity))) +
+  geom_point()
+```
+
+
+##Label Encoding for Linear Regression
+```{r}
+# Convert categorical variables to numeric
+# lab_enc = LabelEncoder.fit(updatedAccidents$City)
+# 
+# updatedAccidents$City <- transform(lab_enc, updatedAccidents$City)
+# 
+# lab_enc = LabelEncoder.fit(updatedAccidents$Weather_Condition)
+# 
+# updatedAccidents$Weather_Condition <- transform(lab_enc, updatedAccidents$Weather_Condition)
+# (updatedAccidents)
+# 
+# head(updatedAccidents, 20)
 ```
 
 
 ##Linear Regression Model
 ```{r}
-
+# lm.fit <- lm(Severity ~ ., updatedAccidents)
+# 
+# summary(lm.fit)
 ```
 
