@@ -25,50 +25,56 @@ library(CatEncoders)
 
 ##Loading the dataset of US car accident data
 ```{r}
+library(tidyverse)
 # Load subset of LA car accident data
-la_accidents <- read.csv("LA_Accidents.csv")
-
-head(la_accidents, 20)
+la_accidents <- read_csv("LA_Accidents.csv")
+head(la_accidents,5)
 ```
-
-##Data Cleaning
 ```{r}
-# Remove County and State columns because they are all the same
+library(CatEncoders)
+updatedAccidents2 <- la_accidents[-5:-6]
+updatedAccidents2 <- filter(updatedAccidents2, Severity != 1)
+updatedAccidents2 <- mutate(updatedAccidents2, Severity = Severity - 1)
 updatedAccidents <- la_accidents[-5:-6]
-updatedAccidents <- filter(updatedAccidents, Severity != 1)
-updatedAccidents <- mutate(updatedAccidents, Severity = Severity - 1)
+lab_enc = LabelEncoder.fit(updatedAccidents$City)
+
+updatedAccidents$City <- transform(lab_enc, updatedAccidents$City)
+
+lab_enc = LabelEncoder.fit(updatedAccidents$Weather_Condition)
+
+updatedAccidents$Weather_Condition <- transform(lab_enc, updatedAccidents$Weather_Condition)
+(updatedAccidents)
+
+#storage <- list()
+#for(i in names(updatedAccidents)[-1]){
+#  storage[[i]] <- summary(lm(Severity ~ get(i), updatedAccidents))
+#}
+
+#print(storage)
+#mlr <- lm(Severity ~ ., updatedAccidents)
+mlr <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents)
+summary(mlr)
+#Start_Time, End_Time, `Visibility(mi)`, `Wind_Speed(mph)`, Weather_Condition, Junction, Railway, Station, Traffic_Signal
 ```
 
-
-##Exploratory Data Analysis (Graphs)
 ```{r}
-library(ggplot2)
+updatedAccidents3 <- scale(updatedAccidents[-1:-3])
+updatedAccidents3 <- cbind(updatedAccidents[1:3],updatedAccidents3)
+#updatedAccidents3
 
-ggplot(updatedAccidents, aes(x=Wind_Speed.mph., y=Temperature.F., color=factor(Severity))) +
-  geom_point()
+mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents3)
+summary(mlr2)
 ```
 
-
-##Label Encoding for Linear Regression
 ```{r}
-# Convert categorical variables to numeric
-# lab_enc = LabelEncoder.fit(updatedAccidents$City)
-# 
-# updatedAccidents$City <- transform(lab_enc, updatedAccidents$City)
-# 
-# lab_enc = LabelEncoder.fit(updatedAccidents$Weather_Condition)
-# 
-# updatedAccidents$Weather_Condition <- transform(lab_enc, updatedAccidents$Weather_Condition)
-# (updatedAccidents)
-# 
-# head(updatedAccidents, 20)
-```
-
-
-##Linear Regression Model
-```{r}
-# lm.fit <- lm(Severity ~ ., updatedAccidents)
-# 
-# summary(lm.fit)
-```
+plotData <- updatedAccidents2 %>% drop_na() %>% select(Severity, Weather_Condition) %>% group_by(Severity, Weather_Condition) %>% summarise(count = n()) %>% filter(count > 1000)
+SeverityvsWeatherPlot <- ggplot(data = plotData) +
+  geom_col(mapping = aes(x = Severity, y = count, fill = Weather_Condition), position = "dodge") +
+  ggtitle("Weather Condition & Severity Plot") + xlab("Severity") + ylab("Severity Count") +
+  geom_text(mapping = aes(x = Severity, y = count, fill = Weather_Condition, label = count),hjust = -.1, position = position_dodge(width = .9)) + coord_flip()
+  
+SeverityvsWeatherPlot
+#pdf(file="WeatherCond_Vs_Severity.pdf")
+#SeverityvsWeatherPlot
+#dev.off()
 
