@@ -58,5 +58,19 @@ mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph
 summary(mlr2)
 ```
 
+```{r}
+plotData <- updatedAccidents2 %>% drop_na() %>% select(Severity, Weather_Condition) %>% group_by(Severity, Weather_Condition) %>% summarise(count = n()) %>% filter(count > 1000)
+SeverityvsWeatherPlot <- ggplot(data = plotData) +
+  geom_col(mapping = aes(x = Severity, y = count, fill = Weather_Condition), position = "dodge") +
+  ggtitle("Weather Condition & Severity Plot") + xlab("Severity") + ylab("Severity Count") +
+  geom_text(mapping = aes(x = Severity, y = count, fill = Weather_Condition, label = count),hjust = -.1, position = position_dodge(width = .9)) + coord_flip()
+  
+SeverityvsWeatherPlot
+pdf(file="WeatherCond_Vs_Severity.pdf")
+SeverityvsWeatherPlot
+dev.off()
+```
+
+
 
 
