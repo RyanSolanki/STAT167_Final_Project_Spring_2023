@@ -108,3 +108,31 @@ summary(mlr)
 # summary(mlr2)
 ```
 
+```{r}
+updatedAccidents3 <- la_accidents[-5:-6]
+updatedAccidents3 <- filter(updatedAccidents2, Severity != 1)
+updatedAccidents3 <- mutate(updatedAccidents2, Severity = Severity - 1)
+colnames(updatedAccidents3)[6] ="Temperature.F."
+colnames(updatedAccidents3)[7] ="Visibility.mi."
+
+#head(updatedAccidents3)
+
+#plotData <- updatedAccidents3 %>% drop_na() %>% select(Severity, Visibility.mi.) %>% group_by(Severity, Visibility.mi.) %>% summarise(count = n()) %>% filter(count > 1000)
+#SeverityvsWeatherPlot3 <- ggplot(data = plotData) +
+  #geom_bar(mapping = aes(x = Severity, y = count, fill = Visibility.mi.), position = "dodge") +
+  #ggtitle("Visibility & Severity Graph") + xlab("Severity") + ylab("Severity Count") +
+  #geom_text(mapping = aes(x = Severity, y = Visibility.mi., fill = Visibility.mi., label = count),hjust = -.1, position = position_dodge(width = .9)) + coord_flip()
+  
+#SeverityvsWeatherPlot3
+```
+
+```{r}
+scatter_plot_with_regression <- ggplot(updatedAccidents3, aes(x = Severity, y = Visibility.mi., color=factor(Severity))) +
+  geom_point() +
+  labs(title = "Severity Vs Visibility (mi)",
+       x = "Severity",
+       y = "Visibility") +
+  theme_minimal()
+
+print(scatter_plot_with_regression)
+```
