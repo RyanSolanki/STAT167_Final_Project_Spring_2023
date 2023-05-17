@@ -36,34 +36,30 @@ library(CatEncoders)
 updatedAccidents2 <- la_accidents[-5:-6]
 updatedAccidents2 <- filter(updatedAccidents2, Severity != 1)
 updatedAccidents2 <- mutate(updatedAccidents2, Severity = Severity - 1)
-colnames(updatedAccidents2)[6] ="Temperature.F."
-colnames(updatedAccidents2)[8] ="Wind_Speed.mph."
+colnames(updatedAccidents2)[5] ="Temperature.F."
+colnames(updatedAccidents2)[6] ="Visibility.miles."
+colnames(updatedAccidents2)[7] ="Wind_Speed.mph."
+colnames(updatedAccidents2)[8] ="Precipitation.inches."
 
 updatedAccidents <- la_accidents[-5:-6]
 lab_enc = LabelEncoder.fit(updatedAccidents$City)
 
 updatedAccidents$City <- transform(lab_enc, updatedAccidents$City)
+updatedAccidents2$City <- transform(lab_enc, updatedAccidents2$City)
 
 lab_enc = LabelEncoder.fit(updatedAccidents$Weather_Condition)
 
 updatedAccidents$Weather_Condition <- transform(lab_enc, updatedAccidents$Weather_Condition)
-(updatedAccidents)
 
-#storage <- list()
-#for(i in names(updatedAccidents)[-1]){
-#  storage[[i]] <- summary(lm(Severity ~ get(i), updatedAccidents))
-#}
-
-#print(storage)
-#mlr <- lm(Severity ~ ., updatedAccidents)
-# mlr <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents)
-# summary(mlr)
-#Start_Time, End_Time, `Visibility(mi)`, `Wind_Speed(mph)`, Weather_Condition, Junction, Railway, Station, Traffic_Signal
+head(updatedAccidents, 10)
 ```
 
 ```{r}
-ggplot(updatedAccidents2, aes(x=Wind_Speed.mph., y=Temperature.F., color=factor(Severity))) +
-  geom_point()
+ggplot(updatedAccidents2) +
+  geom_point(aes(x=Wind_Speed.mph., y=Temperature.F., color=factor(Severity))) +
+  ggtitle("Scatterplot - Temperature vs Wind Speed") +
+  xlab("Wind Speed(Normalized)") +
+  ylab("Temperature(Normalized)")
 ```
 
 ```{r}
@@ -77,9 +73,37 @@ SeverityvsWeatherPlot
 ```
 
 ```{r}
-# updatedAccidents3 <- scale(updatedAccidents[-1:-3])
-# updatedAccidents3 <- cbind(updatedAccidents[1:3],updatedAccidents3)
-# 
-# mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents3)
-# summary(mlr2)
+library(gridExtra)
+
+head(updatedAccidents2, 10)
+plot1 <- ggplot(updatedAccidents2, aes(x = Severity, y = Temperature.F.)) +
+geom_point() + geom_smooth(method = "lm")
+plot2 <- ggplot(updatedAccidents2, aes(x = Severity, y = Wind_Speed.mph.)) +
+geom_point() + geom_smooth(method = "lm")
+plot3 <- ggplot(updatedAccidents2, aes(x = Severity, y = Visibility.miles.)) +
+geom_point() + geom_smooth(method = "lm")
+plot3 <- ggplot(updatedAccidents2, aes(x = Severity, y = Visibility.miles.)) +
+geom_point() + geom_smooth(method = "lm")
+plot4 <- ggplot(updatedAccidents2, aes(x = Severity, y = City)) +
+geom_point() + geom_smooth(method = "lm")
+plot5 <- ggplot(updatedAccidents2, aes(x = Severity, y = Precipitation.inches.)) +
+geom_point() + geom_smooth(method = "lm")
+grid.arrange(plot1, plot2, plot3, plot4, plot5, ncol=2)
+```
+
+```{r}
+storage <- list()
+for(i in names(updatedAccidents)[-1]){
+  storage[[i]] <- summary(lm(Severity ~ get(i), updatedAccidents))
+}
+#print(storage)
+
+mlr <- lm(Severity ~ ., updatedAccidents)
+summary(mlr)
+
+updatedAccidents3 <- scale(updatedAccidents[-1:-3])
+updatedAccidents3 <- cbind(updatedAccidents[1:3],updatedAccidents3)
+ 
+mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents3)
+summary(mlr2)
 ```
