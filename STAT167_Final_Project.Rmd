@@ -101,9 +101,10 @@ for(i in names(updatedAccidents)[-1]){
 mlr <- lm(Severity ~ ., updatedAccidents)
 summary(mlr)
 
-updatedAccidents3 <- scale(updatedAccidents[-1:-3])
-updatedAccidents3 <- cbind(updatedAccidents[1:3],updatedAccidents3)
- 
-mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents3)
-summary(mlr2)
+# updatedAccidents3 <- scale(updatedAccidents[-1:-3])
+# updatedAccidents3 <- cbind(updatedAccidents[1:3],updatedAccidents3)
+#  
+# mlr2 <- lm(Severity ~ Start_Time + End_Time + `Visibility(mi)` + `Wind_Speed(mph)` + Weather_Condition + Junction + Railway + Station + Traffic_Signal, updatedAccidents3)
+# summary(mlr2)
 ```
+
