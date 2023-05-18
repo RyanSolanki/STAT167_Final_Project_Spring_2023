@@ -108,3 +108,59 @@ summary(mlr)
 # summary(mlr2)
 ```
 
+
+#Shuqiao EDA
+
+```{r}
+updatedAccidents3 <- la_accidents[-5:-6]
+updatedAccidents3 <- filter(updatedAccidents2, Severity != 1)
+updatedAccidents3 <- mutate(updatedAccidents2, Severity = Severity - 1)
+colnames(updatedAccidents3)[7] ="Visibility.mi."
+
+finalAccident3 <- updatedAccidents3 %>%
+filter(City %in% c("Los Angeles"))
+
+#head(updatedAccidents3)
+eda1 <- finalAccident3[1:1000, ]
+
+scatter_plot <- ggplot(eda1, (aes(y = Severity, x = Visibility.mi.))) +
+  geom_point() +
+  labs(title = "Severity Vs Visibility (mi)",
+       y = "Severity",
+       x = "Visibility") +
+  theme_minimal()
+
+print(scatter_plot)
+```
+
+
+```{r}
+#head(updatedAccidents)
+eDA2 <- updatedAccidents2[updatedAccidents2$City == 'Los Angeles',]
+colnames(eDA2)[5] ="Temperature"
+
+eda2a <- eDA2[1:1000, ]
+
+scatter_plot2 <- ggplot(eda2a, (aes(x = Severity, y = Temperature, colour=Temperature))) +
+  geom_point() +
+  labs(title = "Severity Vs Temperature",
+       x = "Severity",
+       y = "Temperature") +
+  theme_minimal()
+
+print(scatter_plot2)
+```
+
+```{r}
+
+eda2b <- eDA2[1:5000, ]
+
+scatter_plot3 <- ggplot(eda2b, (aes(x = Severity, y = Traffic_Calming, colour=Traffic_Calming))) +
+  geom_point() +
+  labs(title = "Severity Vs Traffic Calming",
+       x = "Severity",
+       y = "Traffic Calming") +
+  theme_minimal()
+
+print(scatter_plot3)
+```
