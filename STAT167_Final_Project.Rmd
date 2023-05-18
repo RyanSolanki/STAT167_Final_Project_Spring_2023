@@ -108,3 +108,50 @@ summary(mlr)
 # summary(mlr2)
 ```
 
+```{r}
+library(dplyr)
+library(tidyr)
+
+newDF1 <- updatedAccidents2[ , c("Severity", "Traffic_Calming", "Crossing", "Traffic_Signal")]  
+
+#filtered_df1 <- subset(newDF1, Traffic_Calming != 0)
+#filtered_df2 <- subset(newDF1, Traffic_Signal != 0)
+#filtered_df3 <- subset(newDF1, Crossing != 0)
+
+newDF1$dbl_col_binned <- cut(newDF1$Severity, breaks = 5, labels = FALSE)
+agg_data <- aggregate(Traffic_Calming ~ dbl_col_binned, data = newDF1, FUN = mean)
+
+plot1a <- ggplot(agg_data, aes(x = factor(dbl_col_binned), y = Traffic_Calming)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "  Traffic Calming Vs. Severity",
+       x = "Binned Severity Values",
+       y = "Traffic Calming")
+
+newDF1$dbl_col_binned <- cut(newDF1$Severity, breaks = 5, labels = FALSE)
+agg_data <- aggregate(Traffic_Signal ~ dbl_col_binned, data = newDF1, FUN = mean)
+
+plot2a <- ggplot(agg_data, aes(x = factor(dbl_col_binned), y = Traffic_Signal)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Traffic Signals Vs. Severity",
+       x = "Binned Severity Values",
+       y = "Traffic Signals")
+
+
+
+newDF1$dbl_col_binned <- cut(newDF1$Severity, breaks = 5, labels = FALSE)
+agg_data <- aggregate(Crossing ~ dbl_col_binned, data = newDF1, FUN = mean)
+
+plot3a <- ggplot(agg_data, aes(x = factor(dbl_col_binned), y = Crossing)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Crossings Vs. Severity",
+       x = "Binned Severity Values",
+       y = "Crossings")
+
+
+grid.arrange(plot1a, plot2a, plot3a, ncol=3)
+
+
+```
