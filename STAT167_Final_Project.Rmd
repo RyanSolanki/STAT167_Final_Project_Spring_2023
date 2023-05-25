@@ -35,7 +35,6 @@ library(CatEncoders)
 
 updatedAccidents2 <- la_accidents[-5:-6]
 updatedAccidents2 <- filter(updatedAccidents2, Severity != 1)
-updatedAccidents2 <- mutate(updatedAccidents2, Severity = Severity - 1)
 colnames(updatedAccidents2)[5] ="Temperature.F."
 colnames(updatedAccidents2)[6] ="Visibility.miles."
 colnames(updatedAccidents2)[7] ="Wind_Speed.mph."
@@ -77,18 +76,14 @@ library(gridExtra)
 
 head(updatedAccidents2, 10)
 plot1 <- ggplot(updatedAccidents2, aes(x = Severity, y = Temperature.F.)) +
-geom_point() + geom_smooth(method = "lm")
+geom_point() + geom_smooth(method = "lm") + xlab("Accident Severity") + ylab("Temperature (F)")
 plot2 <- ggplot(updatedAccidents2, aes(x = Severity, y = Wind_Speed.mph.)) +
-geom_point() + geom_smooth(method = "lm")
+geom_point() + geom_smooth(method = "lm") + xlab("Accident Severity") + ylab("Wind Speed (mph)")
 plot3 <- ggplot(updatedAccidents2, aes(x = Severity, y = Visibility.miles.)) +
-geom_point() + geom_smooth(method = "lm")
-plot3 <- ggplot(updatedAccidents2, aes(x = Severity, y = Visibility.miles.)) +
-geom_point() + geom_smooth(method = "lm")
-plot4 <- ggplot(updatedAccidents2, aes(x = Severity, y = City)) +
-geom_point() + geom_smooth(method = "lm")
+geom_point() + geom_smooth(method = "lm") + xlab("Accident Severity") + ylab("Visibility (miles)")
 plot5 <- ggplot(updatedAccidents2, aes(x = Severity, y = Precipitation.inches.)) +
-geom_point() + geom_smooth(method = "lm")
-grid.arrange(plot1, plot2, plot3, plot4, plot5, ncol=2)
+geom_point() + geom_smooth(method = "lm") + xlab("Accident Severity") + ylab("Precipitation (inches)")
+grid.arrange(plot1, plot2, plot3, plot5, ncol=2)
 ```
 
 ```{r}
