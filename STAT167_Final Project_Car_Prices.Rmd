@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(CatEncoders)
 library(gridExtra)
+library(dplyr)
 ```
 
 ##Loading the dataset of US car data
@@ -43,7 +44,25 @@ head(car_data, 5)
 
 ## Exploratory Data Analysis
 ```{r}
+#shows selling price vs condition for each year
+ggplot(data = car_data) +
+  geom_point(mapping = aes(x = condition, y = sellingprice)) +
+  facet_wrap(~ year) + 
+  labs(title = "Selling Price vs Condition by Year")
 
+#adds column called diff1 that calculates the differences between sellingprice and MMR
+#selects top 10 differences by make of the car
+car_data <- mutate(car_data, diff = sellingprice - mmr)
+car_data1 <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(diff)) %>%
+  summarise(diff1 = mean(diff)) %>%
+  head(10)
+
+#plots top 10 differences by make
+ggplot(data = car_data1) +
+  geom_point(mapping = aes(x = diff1, y = make)) +
+  labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
 ```
 
 ## Multiple Linear Regression
