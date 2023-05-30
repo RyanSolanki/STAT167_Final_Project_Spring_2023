@@ -63,6 +63,36 @@ car_data1 <- car_data %>%
 ggplot(data = car_data1) +
   geom_point(mapping = aes(x = diff1, y = make)) +
   labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
+  
+  
+#clean dataset to help with dupe removal 
+car_data$make <- tolower(car_data$make)
+car_data$model <- tolower(car_data$model)
+#remove duplicate rows to only contain singular makes
+dataset_no_duplicates <- car_data[!duplicated(car_data$model), ]
+
+#install.packages("splitstackshape")
+library(splitstackshape)
+
+#Statified sampling due to large dataset size
+smaller_dataset <- stratified(dataset_no_duplicates, "make", size = 0.05)
+
+#Relationship between selling price and a car's make and model 
+ggplot(smaller_dataset, aes(x = make, y = sellingprice, color = model)) +
+  geom_point() +
+  labs(x = "Make", y = "Selling Price", title = "Selling Price of Cars by Make and Model") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+#Relationship between odometer miles and selling price
+ggplot(car_data, aes(x = odometer, y = sellingprice)) +
+  geom_point() +
+  labs(x = "Odometer Miles", y = "Selling Price", title = "Odometer Miles and Selling Price") +
+  theme_minimal()
+  
+  
 ```
 
 ## Multiple Linear Regression
