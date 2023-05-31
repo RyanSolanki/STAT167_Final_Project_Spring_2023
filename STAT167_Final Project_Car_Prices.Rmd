@@ -92,6 +92,7 @@ mlr <- lm(sellingprice ~ ., regression_data)
 summary(mlr)
 ```
 
+
 ```{r}
 # Residual plot used to see if relationship is linear
 diagnostics <- tibble(predictions = mlr$fitted.values, residuals = mlr$residuals)
@@ -101,4 +102,21 @@ geom_point() + geom_smooth(se = F)+
 geom_hline(yintercept = 0, linetype = 2)
 ```
 
+## GAM clustering
+```{r}
+library(mgcv)
+model <- gam(sellingprice ~ year+make+model+trim+transmission+state+condition+odometer+interior+color+mmr, data=regression_data)
+summary(model)
+# set.seed(167)
+# 
+# #install.packages("factoextra")
+# library(factoextra)
+# 
+# # Elbow graph to find optimal number of clusters
+# fviz_nbclust(df, kmeans, method = "wss")
+# 
+# # K-means model with 3 clusters
+# model <- kmeans(regression_data, 3, nstart = 25)
+# print(model)
+```
 
