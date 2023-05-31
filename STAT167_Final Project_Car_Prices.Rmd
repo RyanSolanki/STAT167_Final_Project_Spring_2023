@@ -1,0 +1,123 @@
+---
+title: "STAT167 Final Project - Spring 2023"
+authors: "Ryan Solanki, Jake Merrill, Girum Yaye, Harrison Chow, Shuqiao Yu"
+date: "2023/5/12"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+#STAT 167 Final Project - Spring 2023
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Required libraries
+```{r}
+library(tidyverse)
+library(CatEncoders)
+library(gridExtra)
+library(dplyr)
+```
+
+##Loading the dataset of US car data
+```{r}
+# Load car data
+car_data <- read_csv("car_prices.csv")
+head(car_data,5)
+```
+## Data Cleaning
+```{r}
+# Drop NA values in dataset
+car_data <- car_data %>% drop_na()
+
+# Remove unnecessary variables 
+car_data <- subset(car_data, select = -c(vin, seller, saledate))
+
+head(car_data, 5)
+```
+
+## Exploratory Data Analysis
+```{r}
+#shows selling price vs condition for each year
+ggplot(data = car_data) +
+  geom_point(mapping = aes(x = condition, y = sellingprice)) +
+  facet_wrap(~ year) + 
+  labs(title = "Selling Price vs Condition by Year")
+
+#adds column called diff1 that calculates the differences between sellingprice and MMR
+#selects top 10 differences by make of the car
+car_data <- mutate(car_data, diff = sellingprice - mmr)
+car_data1 <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(diff)) %>%
+  summarise(diff1 = mean(diff)) %>%
+  head(10)
+
+#plots top 10 differences by make
+ggplot(data = car_data1) +
+  geom_point(mapping = aes(x = diff1, y = make)) +
+  labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
+```
+
+## Multiple Linear Regression
+```{r}
+# Transform non numeric values to numeric for Linear regression using label encoder
+regression_data <- car_data
+
+# Convert car make to numeric values
+lab_enc = LabelEncoder.fit(regression_data$make)
+regression_data$make <- transform(lab_enc, regression_data$make)
+
+# Convert car model to numeric values
+lab_enc = LabelEncoder.fit(regression_data$model)
+regression_data$model <- transform(lab_enc, regression_data$model)
+
+# Convert car trim to numeric values
+lab_enc = LabelEncoder.fit(regression_data$trim)
+regression_data$trim <- transform(lab_enc, regression_data$trim)
+
+# Convert car body style to numeric values
+lab_enc = LabelEncoder.fit(regression_data$body)
+regression_data$body <- transform(lab_enc, regression_data$body)
+
+# Convert car transmission type to numeric values
+lab_enc = LabelEncoder.fit(regression_data$transmission)
+regression_data$transmission <- transform(lab_enc, regression_data$transmission)
+
+# Convert state to numeric values
+lab_enc = LabelEncoder.fit(regression_data$state)
+regression_data$state <- transform(lab_enc, regression_data$state)
+
+# Convert car exterior color to numeric values
+lab_enc = LabelEncoder.fit(regression_data$color)
+regression_data$color <- transform(lab_enc, regression_data$color)
+
+# Convert car interior color to numeric values
+lab_enc = LabelEncoder.fit(regression_data$interior)
+regression_data$interior <- transform(lab_enc, regression_data$interior)
+
+head(regression_data, 5)
+```
+
+```{r}
+# Multiple Linear Regression Model to predict selling price
+mlr <- lm(sellingprice ~ ., regression_data)
+summary(mlr)
+```
+
+```{r}
+# Residual plot used to see if relationship is linear
+diagnostics <- tibble(predictions = mlr$fitted.values, residuals = mlr$residuals)
+
+ggplot(diagnostics, aes(x = predictions, y = residuals)) +
+geom_point() + geom_smooth(se = F)+
+geom_hline(yintercept = 0, linetype = 2)
+```
+
+
