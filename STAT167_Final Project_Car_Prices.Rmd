@@ -24,11 +24,13 @@ library(CatEncoders)
 library(gridExtra)
 library(dplyr)
 library(splitstackshape)
+library(boot)
 ```
 
 ##Loading the dataset of US car data
 ```{r}
 # Load car data
+set.seed(167)
 car_data <- read_csv("car_prices.csv")
 head(car_data,5)
 ```
@@ -162,8 +164,24 @@ head(regression_data, 5)
 
 ```{r}
 # Multiple Linear Regression Model to predict selling price
+# base model with no explanatory variables
+baseModel <- lm(sellingprice ~ 1, regression_data)
+# full model with all explanatory variables
+fullModel <- lm(sellingprice ~ ., regression_data)
+# do stepwise to find out the best linear regression model
+stepModel <- step(baseModel, scope = list(upper = fullModel, lower = ~1), direction = "forward")
+summary(stepModel)
 mlr <- lm(sellingprice ~ . -model, regression_data)
 summary(mlr)
+
+# k fold cross validation
+d <- 10
+MSE.cv.10 <- rep(0,d)
+for(i in 1:d) {
+  glm.fit <- glm(sellingprice ~., data = regression_data)
+  MSE.cv.10[i] <- cv.glm(regression_data, glm.fit, K = d)$delta[1]
+}
+MSE.cv.10
 ```
 
 ```{r}
