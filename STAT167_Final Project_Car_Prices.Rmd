@@ -23,6 +23,7 @@ library(tidyverse)
 library(CatEncoders)
 library(gridExtra)
 library(dplyr)
+library(splitstackshape)
 ```
 
 ##Loading the dataset of US car data
@@ -31,6 +32,7 @@ library(dplyr)
 car_data <- read_csv("car_prices.csv")
 head(car_data,5)
 ```
+
 ## Data Cleaning
 ```{r}
 # Drop NA values in dataset
@@ -49,30 +51,32 @@ ggplot(data = car_data) +
   geom_point(mapping = aes(x = condition, y = sellingprice)) +
   facet_wrap(~ year) + 
   labs(title = "Selling Price vs Condition by Year")
+```
 
+```{r}
 #adds column called diff1 that calculates the differences between sellingprice and MMR
 #selects top 10 differences by make of the car
-car_data <- mutate(car_data, diff = sellingprice - mmr)
-car_data1 <- car_data %>%
+car_data1 <- car_data
+car_data1$diff = car_data1$sellingprice - car_data1$mmr
+car_data1 <- car_data1 %>%
   group_by(make) %>%
   arrange(desc(diff)) %>%
-  summarise(diff1 = mean(diff)) %>%
-  head(10)
+  summarise(diff1 = mean(diff))
 
 #plots top 10 differences by make
 ggplot(data = car_data1) +
   geom_point(mapping = aes(x = diff1, y = make)) +
   labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
+```
   
-  
-#clean dataset to help with dupe removal 
-car_data$make <- tolower(car_data$make)
-car_data$model <- tolower(car_data$model)
-#remove duplicate rows to only contain singular makes
-dataset_no_duplicates <- car_data[!duplicated(car_data$model), ]
+```{r}
+#clean dataset to help with dupe removal
+dataset_no_duplicates <- car_data
+dataset_no_duplicates$make <- tolower(dataset_no_duplicates$make)
+dataset_no_duplicates$model <- tolower(dataset_no_duplicates$model)
 
-#install.packages("splitstackshape")
-library(splitstackshape)
+#remove duplicate rows to only contain singular makes
+dataset_no_duplicates <- dataset_no_duplicates[!duplicated(dataset_no_duplicates$model), ]
 
 #Statified sampling due to large dataset size
 smaller_dataset <- stratified(dataset_no_duplicates, "make", size = 0.05)
@@ -83,16 +87,37 @@ ggplot(smaller_dataset, aes(x = make, y = sellingprice, color = model)) +
   labs(x = "Make", y = "Selling Price", title = "Selling Price of Cars by Make and Model") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+selling_prices_high <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(sellingprice)) %>%
+  head(200)
+selling_prices_high <- selling_prices_high %>% drop_na()
+
+ggplot(data = selling_prices_high) +
+  geom_col(mapping = aes(x = make, y = sellingprice, fill = body)) +
+  labs(x = "make", y = "selling price", title = "highest selling price vs. make of the car")
+
+selling_prices_low <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(-sellingprice)) %>%
+  head(100)
+selling_prices_low <- selling_prices_low %>% drop_na()
+
+ggplot(data = selling_prices_low) +
+  geom_col(mapping = aes(x = make, y = sellingprice, fill = body)) +
+  labs(x = "make", y = "selling price", title = "lowest selling price vs. make of the car")
+```
 
 
-
+```{r}
 #Relationship between odometer miles and selling price
 ggplot(car_data, aes(x = odometer, y = sellingprice)) +
   geom_point() +
   labs(x = "Odometer Miles", y = "Selling Price", title = "Odometer Miles and Selling Price") +
   theme_minimal()
-  
-  
 ```
 
 ## Multiple Linear Regression
@@ -137,10 +162,9 @@ head(regression_data, 5)
 
 ```{r}
 # Multiple Linear Regression Model to predict selling price
-mlr <- lm(sellingprice ~ ., regression_data)
+mlr <- lm(sellingprice ~ . -model, regression_data)
 summary(mlr)
 ```
-
 
 ```{r}
 # Residual plot used to see if relationship is linear
@@ -151,21 +175,10 @@ geom_point() + geom_smooth(se = F)+
 geom_hline(yintercept = 0, linetype = 2)
 ```
 
-## GAM clustering
+## GAM Model
 ```{r}
 library(mgcv)
 model <- gam(sellingprice ~ year+make+model+trim+transmission+state+condition+odometer+interior+color+mmr, data=regression_data)
 summary(model)
-# set.seed(167)
-# 
-# #install.packages("factoextra")
-# library(factoextra)
-# 
-# # Elbow graph to find optimal number of clusters
-# fviz_nbclust(df, kmeans, method = "wss")
-# 
-# # K-means model with 3 clusters
-# model <- kmeans(regression_data, 3, nstart = 25)
-# print(model)
 ```
 
