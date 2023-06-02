@@ -193,10 +193,3 @@ geom_point() + geom_smooth(se = F)+
 geom_hline(yintercept = 0, linetype = 2)
 ```
 
-## GAM Model
-```{r}
-library(mgcv)
-model <- gam(sellingprice ~ year+make+model+trim+transmission+state+condition+odometer+interior+color+mmr, data=regression_data)
-summary(model)
-```
-
