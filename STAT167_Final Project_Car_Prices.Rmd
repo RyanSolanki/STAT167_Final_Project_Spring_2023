@@ -63,9 +63,10 @@ car_data1$diff = car_data1$sellingprice - car_data1$mmr
 car_data1 <- car_data1 %>%
   group_by(make) %>%
   arrange(desc(diff)) %>%
-  summarise(diff1 = mean(diff))
+  summarise(diff1 = mean(diff)) %>%
+  head(20)
 
-#plots top 10 differences by make
+#plots top 20 differences by make
 ggplot(data = car_data1) +
   geom_point(mapping = aes(x = diff1, y = make)) +
   labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
@@ -192,11 +193,3 @@ ggplot(diagnostics, aes(x = predictions, y = residuals)) +
 geom_point() + geom_smooth(se = F)+
 geom_hline(yintercept = 0, linetype = 2)
 ```
-
-## GAM Model
-```{r}
-library(mgcv)
-model <- gam(sellingprice ~ year+make+model+trim+transmission+state+condition+odometer+interior+color+mmr, data=regression_data)
-summary(model)
-```
-
