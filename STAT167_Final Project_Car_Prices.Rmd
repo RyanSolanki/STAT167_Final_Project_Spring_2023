@@ -81,14 +81,14 @@ dataset_no_duplicates$model <- tolower(dataset_no_duplicates$model)
 #remove duplicate rows to only contain singular makes
 dataset_no_duplicates <- dataset_no_duplicates[!duplicated(dataset_no_duplicates$model), ]
 
-#Statified sampling due to large dataset size
+#Stratified sampling due to large dataset size
 smaller_dataset <- stratified(dataset_no_duplicates, "make", size = 0.05)
 
 #Relationship between selling price and a car's make and model 
-ggplot(smaller_dataset, aes(x = make, y = sellingprice, color = model)) +
+ ggplot(smaller_dataset, aes(x = make, y = sellingprice, color = model)) +
   geom_point() +
   labs(x = "Make", y = "Selling Price", title = "Selling Price of Cars by Make and Model") +
-  theme_minimal() +
+  theme_minimal(base_size = 8) + # change the base_size to a smaller value
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
