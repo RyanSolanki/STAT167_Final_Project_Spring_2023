@@ -63,8 +63,7 @@ car_data1$diff = car_data1$sellingprice - car_data1$mmr
 car_data1 <- car_data1 %>%
   group_by(make) %>%
   arrange(desc(diff)) %>%
-  summarise(diff1 = mean(diff)) %>%
-  head(20)
+  summarise(diff1 = mean(diff))
 
 #plots top 20 differences by make
 ggplot(data = car_data1) +
@@ -96,22 +95,24 @@ smaller_dataset <- stratified(dataset_no_duplicates, "make", size = 0.05)
 selling_prices_high <- car_data %>%
   group_by(make) %>%
   arrange(desc(sellingprice)) %>%
-  head(200)
+  head(2000)
 selling_prices_high <- selling_prices_high %>% drop_na()
 
 ggplot(data = selling_prices_high) +
   geom_col(mapping = aes(x = make, y = sellingprice, fill = body)) +
-  labs(x = "make", y = "selling price", title = "highest selling price vs. make of the car")
+  labs(x = "make", y = "selling price", title = "Highest Selling Prices vs. Car Type") +
+  coord_flip()
 
 selling_prices_low <- car_data %>%
   group_by(make) %>%
   arrange(desc(-sellingprice)) %>%
-  head(100)
+  head(2000)
 selling_prices_low <- selling_prices_low %>% drop_na()
 
 ggplot(data = selling_prices_low) +
   geom_col(mapping = aes(x = make, y = sellingprice, fill = body)) +
-  labs(x = "make", y = "selling price", title = "lowest selling price vs. make of the car")
+  labs(x = "make", y = "selling price", title = "Lowest Selling Prices vs. Car Type") +
+  coord_flip()
 ```
 
 
@@ -164,24 +165,28 @@ head(regression_data, 5)
 ```
 
 ```{r}
-# Multiple Linear Regression Model to predict selling price
+# Multiple Linear Regression Model to predict selling price using forward selection
+
 # base model with no explanatory variables
 baseModel <- lm(sellingprice ~ 1, regression_data)
+
 # full model with all explanatory variables
 fullModel <- lm(sellingprice ~ ., regression_data)
+
 # do stepwise to find out the best linear regression model
 stepModel <- step(baseModel, scope = list(upper = fullModel, lower = ~1), direction = "forward")
 summary(stepModel)
+
+# Normal MLR model without forward selection
 mlr <- lm(sellingprice ~ . -model, regression_data)
 summary(mlr)
+```
 
+```{r}
 # k fold cross validation
-d <- 10
-MSE.cv.10 <- rep(0,d)
-for(i in 1:d) {
-  glm.fit <- glm(sellingprice ~., data = regression_data)
-  MSE.cv.10[i] <- cv.glm(regression_data, glm.fit, K = d)$delta[1]
-}
+glm.fit <- glm(sellingprice ~ mmr + condition + year + odometer + state + transmission + trim + color + interior + body + make, data = regression_data)
+
+MSE.cv.10 <- cv.glm(regression_data, glm.fit, K = 10)$delta[1]
 MSE.cv.10
 ```
 
