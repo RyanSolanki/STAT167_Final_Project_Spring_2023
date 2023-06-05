@@ -166,27 +166,27 @@ head(regression_data, 5)
 
 ```{r}
 # Multiple Linear Regression Model to predict selling price using forward selection
-
+regression_data.scaled <- as_tibble(scale(regression_data))
 # base model with no explanatory variables
-baseModel <- lm(sellingprice ~ 1, regression_data)
+baseModel <- lm(sellingprice ~ 1, regression_data.scaled)
 
 # full model with all explanatory variables
-fullModel <- lm(sellingprice ~ ., regression_data)
+fullModel <- lm(sellingprice ~ ., regression_data.scaled)
 
 # do stepwise to find out the best linear regression model
 stepModel <- step(baseModel, scope = list(upper = fullModel, lower = ~1), direction = "forward")
 summary(stepModel)
 
 # Normal MLR model without forward selection
-mlr <- lm(sellingprice ~ . -model, regression_data)
+mlr <- lm(sellingprice ~ . -model, regression_data.scaled)
 summary(mlr)
 ```
 
 ```{r}
 # k fold cross validation
-glm.fit <- glm(sellingprice ~ mmr + condition + year + odometer + state + transmission + trim + color + interior + body + make, data = regression_data)
+glm.fit <- glm(sellingprice ~ mmr + condition + year + odometer + state + transmission + trim + color + interior + body + make, data = regression_data.scaled)
 
-MSE.cv.10 <- cv.glm(regression_data, glm.fit, K = 10)$delta[1]
+MSE.cv.10 <- cv.glm(regression_data.scaled, glm.fit, K = 10)$delta[1]
 MSE.cv.10
 ```
 
