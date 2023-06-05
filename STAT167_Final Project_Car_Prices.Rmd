@@ -63,8 +63,7 @@ car_data1$diff = car_data1$sellingprice - car_data1$mmr
 car_data1 <- car_data1 %>%
   group_by(make) %>%
   arrange(desc(diff)) %>%
-  summarise(diff1 = mean(diff)) %>%
-  head(20)
+  summarise(diff1 = mean(diff))
 
 #plots top 20 differences by make
 ggplot(data = car_data1) +
