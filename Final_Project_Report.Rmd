@@ -66,7 +66,19 @@ Between 1990 and 2000, the condition of a car had a negligible impact on its sel
 **EDA #2:**
 
 ```{r}
-# Code for selling price vs MMR scatter-plot here
+#adds column called diff1 that calculates the differences between selling price and MMR
+#selects top 10 differences by make of the car
+car_data1 <- car_data
+car_data1$diff = car_data1$sellingprice - car_data1$mmr
+car_data1 <- car_data1 %>%
+  group_by(make) %>%
+  arrange(desc(diff)) %>%
+  summarise(diff1 = mean(diff)) %>% head(100000)
+
+#plots top 20 differences by make
+ggplot(data = car_data1) +
+  geom_point(mapping = aes(x = diff1, y = make)) +
+  labs(y = "Make",x = "Difference Between Selling Price & MMR", title = "Make vs Diference in Selling Price & MMR")
 ```
 
 We have introduced a new attribute to capture the disparities between the selling price and MMR. Through our analysis, we discovered that luxury car brands like Fisker, Ferrari, Bentley, and Aston Martin exhibited notable distinctions. Aston Martin emerged as the car brand with the highest positive difference between the selling price and MMR, indicating a higher selling price than estimated. Conversely, Fisker, the lowest-ranked car brand in this regard, displayed the most significant negative difference, suggesting a selling price lower than the estimated value.
@@ -75,7 +87,14 @@ We have introduced a new attribute to capture the disparities between the sellin
 **EDA #3:**
 
 ```{r}
-# Code for selling price vs MMR by state box-plot here
+car_data <- mutate(car_data, diff = sellingprice - mmr)
+difference_sp_mmr <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(diff)) %>%
+  head(100)
+
+ggplot(data = difference_sp_mmr) +
+  geom_boxplot(mapping = aes(x = state, y = diff)) + labs(x = "states", y = "difference between selling price and mmr", title = "states vs. difference between sp and mmr") + ylim(low = NA, high = 100000)
 ```
 
 Since our main variable to measure is car prices, the difference/disparities between the selling price and MMR might be a key figure in telling us more about our key variable. When comparing the difference between selling price and MMR, there came the question of whether this difference was equal for all states that were measured in the United States. Using a box plot, it was found that this was not true. The states of Nevada, Ohio, Pennsylvania and New Jersey had the highest disparity among all the states in the data set. In the special case of Missouri, the median difference was quite low but its maximum value was among the highest in the set.
@@ -84,7 +103,15 @@ Since our main variable to measure is car prices, the difference/disparities bet
 **EDA #4:**
 
 ```{r}
-# Code for selling price vs make of car bar plot
+selling_prices_high <- car_data %>%
+  group_by(make) %>%
+  arrange(desc(sellingprice)) %>%
+  head(200)
+selling_prices_high <- selling_prices_high %>% drop_na()
+
+ggplot(data = selling_prices_high) +
+  geom_col(mapping = aes(x = make, y = sellingprice, fill = body)) +
+  labs(x = "make", y = "selling price", title = "highest selling price vs. make of the car") + coord_flip()
 ```
 
 Furthermore, comparing the selling price of the car with the make of the car reveals an expected but also telling idea about how specific brands will be related to high selling prices while others are related to low selling prices. After arranging the data set by the selling prices and choosing the top 200 results, it revealed the makes of cars such as Mercedes, Bentley, BMW and Rolls-Royce were among the highest prices. While on the other hand, after arranging the data set in the opposite direction, we found the makes of cars such as Toyota, Chevrolet and Ford to be the most consistent.
@@ -94,6 +121,23 @@ Furthermore, comparing the selling price of the car with the make of the car rev
 
 ```{r}
 # Code for selling price vs model of car bar plot
+# Dot Plot Showcasing Selling Price Disparity Between Various Car Makes & Their Models
+dataset_no_duplicates <- car_data
+dataset_no_duplicates$make <- tolower(dataset_no_duplicates$make)
+dataset_no_duplicates$model <- tolower(dataset_no_duplicates$model)
+
+#remove duplicate rows to only contain singular makes
+dataset_no_duplicates <- dataset_no_duplicates[!duplicated(dataset_no_duplicates$model), ]
+
+#Stratified sampling due to large dataset size
+smaller_dataset <- stratified(dataset_no_duplicates, "make", size = 0.05)
+
+#Relationship between selling price and a car's make and model 
+ ggplot(smaller_dataset, aes(x = make, y = sellingprice, color = model)) +
+  geom_point() +
+  labs(x = "Make", y = "Selling Price", title = "Selling Price of Cars by Make and Model") +
+  theme_minimal(base_size = 8) + # change the base_size to a smaller value
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Following suit with EDA #4, we wanted to better visualize and showcase the disparity between certain car brands among others in accordance to their prices. We all know the notion of price disparity between brands but just how glaring is this difference? Furthermore, while the existence of price difference is clear among car brands, the same cannot be said for the plethora of models within these brands. Which model is cheaper, which is more expensive, the knowledge of this concept is often unknown to the average consumer. Through the integration of a color coded dot plot, we are now able to visually see the disparity between these relations. Akin to common knowledge, brands such as Acura and Lexus are more expensive than their cheaper alternatives Honda and Toyota and sportier models fetch a far higher price within each brand in comparison to their sedan counterparts. 
